@@ -185,6 +185,7 @@ minetest.register_node("freezer:freezer", {
 	sounds = default.node_sound_stone_defaults(),
 
 	tube = (function() if minetest.get_modpath("pipeworks") then return {
+		-- using a different stack from defaut when inserting
 		insert_object = function(pos, node, stack, direction)
 			local meta = minetest.get_meta(pos)
 			local inv = meta:get_inventory()
@@ -192,18 +193,14 @@ minetest.register_node("freezer:freezer", {
 			if not timer:is_started() then
 				timer:start(1.0)
 			end
-			if direction.y == 1 then
-				return inv:add_item("src", stack)
-			end
-				
+			return inv:add_item("src", stack)
 		end,
 		can_insert = function(pos,node,stack,direction)
 			local meta = minetest.get_meta(pos)
 			local inv = meta:get_inventory()
-			if direction.y == 1 then
-				return inv:room_for_item("src", stack)
-			end
+			return inv:room_for_item("src", stack)
 		end,
+		-- the default stack, from which objects will be taken
 		input_inventory = "dst",
 		connect_sides = {left = 1, right = 1, back = 1, front = 1, bottom = 1, top = 1}
 	} end end)(),
