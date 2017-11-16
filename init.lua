@@ -1,3 +1,8 @@
+--
+-- Freezer for mintest: a device which turns water (in buckets) into ice
+-- And does a couple of other tricks, discovering which is left as a pleasant
+-- surprise for the player.
+--
 
 --
 -- Formspecs
@@ -9,10 +14,10 @@ local function active_formspec(fuel_percent, item_percent)
 		default.gui_bg..
 		default.gui_bg_img..
 		default.gui_slots..
-		"list[current_name;src;2.75,0.5;1,1;]"..
+		"list[current_name;src;2.5,1;1,1;]"..
 		"image[3.75,1.5;1,1;gui_furnace_arrow_bg.png^[lowpart:"..
 		(item_percent)..":gui_furnace_arrow_fg.png^[transformR270]"..
-		"list[current_name;dst;4.75,0.96;2,2;]"..
+		"list[current_name;dst;4.75,0.96;3,2;]"..
 		"list[current_player;main;0,4.25;8,1;]"..
 		"list[current_player;main;0,5.5;8,3;8]"..
 		"listring[current_name;dst]"..
@@ -28,9 +33,9 @@ local inactive_formspec =
 	default.gui_bg..
 	default.gui_bg_img..
 	default.gui_slots..
-	"list[current_name;src;2.75,0.5;1,1;]"..
+	"list[current_name;src;2.5,1;1,1;]"..
 	"image[3.75,1.5;1,1;gui_furnace_arrow_bg.png^[transformR270]"..
-	"list[current_name;dst;4.75,0.96;2,2;]"..
+	"list[current_name;dst;4.75,0.96;3,2;]"..
 	"list[current_player;main;0,4.25;8,1;]"..
 	"list[current_player;main;0,5.5;8,3;8]"..
 	"listring[current_name;dst]"..
@@ -40,7 +45,7 @@ local inactive_formspec =
 	default.get_hotbar_bg(0, 4.25)
 
 --
--- Node callback functions that are the same for active and inactive furnace
+-- Node callback functions that are the same for active and inactive freezer
 --
 
 local function can_dig(pos, player)
@@ -49,6 +54,7 @@ local function can_dig(pos, player)
 	return inv:is_empty("dst") and inv:is_empty("src")
 end
 
+	      
 local function allow_metadata_inventory_put(pos, listname, index, stack, player)
 	if minetest.is_protected(pos, player:get_player_name()) then
 		return 0
@@ -62,6 +68,7 @@ local function allow_metadata_inventory_put(pos, listname, index, stack, player)
 	end
 end
 
+	      
 local function allow_metadata_inventory_move(pos, from_list, from_index, to_list, to_index, count, player)
 	local meta = minetest.get_meta(pos)
 	local inv = meta:get_inventory()
@@ -69,6 +76,7 @@ local function allow_metadata_inventory_move(pos, from_list, from_index, to_list
 	return allow_metadata_inventory_put(pos, to_list, to_index, stack, player)
 end
 
+	      
 local function allow_metadata_inventory_take(pos, listname, index, stack, player)
 	if minetest.is_protected(pos, player:get_player_name()) then
 		return 0
@@ -76,6 +84,7 @@ local function allow_metadata_inventory_take(pos, listname, index, stack, player
 	return stack:get_count()
 end
 
+	      
 local function swap_node(pos, name)
 	local node = minetest.get_node(pos)
 	if node.name == name then
@@ -85,6 +94,7 @@ local function swap_node(pos, name)
 	minetest.swap_node(pos, node)
 end
 
+	      
 local function freezer_node_timer(pos, elapsed)
 	--
 	-- Inizialize metadata
@@ -103,19 +113,60 @@ local function freezer_node_timer(pos, elapsed)
 	-- Cooking
 	--
 
-	if inv:contains_item("src", "bucket:bucket_water") then
-	   inv:remove_item("src", "bucket:bucket_water")
-	   inv:add_item("dst", "default:ice")
-	   inv:add_item("src", "bucket:bucket_empty")
+	-- takes both regular and river water
+	if inv:contains_item("src", "bucket:bucket_water") or 
+	      inv:contains_item("src", "bucket:bucket_river_water") then
+		if inv:room_for_item("dst", "default:ice") then
+			inv:remove_item("src", "bucket:bucket_water")
+			inv:remove_item("src", "bucket:bucket_river_water")
+			inv:add_item("dst", "default:ice")
+			inv:add_item("dst", "bucket:bucket_empty")
+	      end
 	end
 	   
-
+	-- an extra recipe involving liquid in a bucket, for good measure
+	-- a cactus pulp bucket gives 2 hp, but freezing it gives 3 popsicles, each
+	-- of them giving 1 hp, achieving 50% increase in efficiency through processing
+	if minetest.get_modpath("ethereal") then
+		if inv:contains_item("src", "ethereal:bucket_cactus") then
+			if inv:room_for_item("dst", "freezer:cactus_popsicle 3") then
+				inv:remove_item("src", "ethereal:bucket_cactus")
+				inv:add_item("dst", "freezer:cactus_popsicle 3")
+				inv:add_item("dst", "bucket:bucket_empty")
+			end
+		end 
+	end
+	
+	-- and yet another liquid in a bucket, this time with no extravagance though
+	if minetest.get_modpath("mobs") and mobs and mobs.mod == "redo" then
+		if inv:contains_item("src", "mobs:bucket_milk") then
+			if inv:room_for_item("dst", "freezer:milk_popsicle 3") then
+				inv:remove_item("src", "mobs:bucket_milk")
+				inv:add_item("dst", "freezer:milk_popsicle 3")
+				inv:add_item("dst", "bucket:bucket_empty")
+			end
+		end 
+	end
 	      
+	-- and of course what is hot can be cooled down
+	if minetest.get_modpath("farming") then
+		if inv:contains_item("src", "farming:coffee_cup_hot") then
+			while inv:room_for_item("dst", "farming:coffee_cup") do
+				local removed = inv:remove_item("src", "farming:coffee_cup_hot")
+				if removed:get_count() > 0 then
+					inv:add_item("dst", "farming:coffee_cup")
+				else
+					break
+				end
+			end
+		end 
+	end
 
 	-- Check if we have cookable content
 	return
 end
 
+	      
 --
 -- Node definitions
 --
@@ -128,11 +179,35 @@ minetest.register_node("freezer:freezer", {
 		"freezer_side.png", "freezer_front.png"
 	},
 	paramtype2 = "facedir",
-	groups = {cracky=2},
+	groups = {cracky = 2, tubedevice = 1, tubedevice_receiver = 1},
 	legacy_facedir_simple = true,
 	is_ground_content = false,
 	sounds = default.node_sound_stone_defaults(),
 
+	tube = (function() if minetest.get_modpath("pipeworks") then return {
+		insert_object = function(pos, node, stack, direction)
+			local meta = minetest.get_meta(pos)
+			local inv = meta:get_inventory()
+			local timer = minetest.get_node_timer(pos)
+			if not timer:is_started() then
+				timer:start(1.0)
+			end
+			if direction.y == 1 then
+				return inv:add_item("src", stack)
+			end
+				
+		end,
+		can_insert = function(pos,node,stack,direction)
+			local meta = minetest.get_meta(pos)
+			local inv = meta:get_inventory()
+			if direction.y == 1 then
+				return inv:room_for_item("src", stack)
+			end
+		end,
+		input_inventory = "dst",
+		connect_sides = {left = 1, right = 1, back = 1, front = 1, bottom = 1, top = 1}
+	} end end)(),
+	                                     
 	can_dig = can_dig,
 
 	on_timer = freezer_node_timer,
@@ -142,7 +217,7 @@ minetest.register_node("freezer:freezer", {
 		meta:set_string("formspec", inactive_formspec)
 		local inv = meta:get_inventory()
 		inv:set_size('src', 1)
-		inv:set_size('dst', 4)
+		inv:set_size('dst', 6)
 	end,
 
 	on_metadata_inventory_move = function(pos)
@@ -150,7 +225,7 @@ minetest.register_node("freezer:freezer", {
 		timer:start(1.0)
 	end,
 	on_metadata_inventory_put = function(pos)
-		-- start timer function, it will sort out whether furnace can burn or not.
+		-- start timer function, it will sort out whether freezer will work or not.
 		local timer = minetest.get_node_timer(pos)
 		timer:start(1.0)
 	end,
@@ -168,6 +243,31 @@ minetest.register_node("freezer:freezer", {
 	allow_metadata_inventory_take = allow_metadata_inventory_take,
 })
 
+	      
+if minetest.get_modpath("ethereal") then
+	minetest.register_craftitem("freezer:cactus_popsicle", {
+	description = "Cactus Pulp Popsicle",
+	inventory_image = "cactus_popsicle.png",
+	wield_image = "cactus_popsicle.png",
+	stack_max = 99,
+	groups = { not_in_creative_inventory = 1 },
+	on_use = minetest.item_eat(1, "default:stick"),
+})
+end
+	      
+	      
+if minetest.get_modpath("mobs") and mobs and mobs.mod == "redo" then
+	minetest.register_craftitem("freezer:milk_popsicle", {
+	description = "Ice Cream Popsicle",
+	inventory_image = "milk_popsicle.png",
+	wield_image = "milk_popsicle.png",
+	stack_max = 99,
+	groups = { not_in_creative_inventory = 1 },
+	on_use = minetest.item_eat(1, "default:stick"),
+})
+end
+	  
+	      
 minetest.register_craft({
 	output = "freezer:freezer",
 	recipe = {
@@ -176,6 +276,8 @@ minetest.register_craft({
 		{"default:steel_ingot", "default:mese_crystal", "default:steel_ingot"}
 	}
 })
+	      
+	      
 minetest.register_craft({
       output = "default:snowblock 3",
       type = "shapeless",
