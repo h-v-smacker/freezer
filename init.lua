@@ -4,6 +4,13 @@
 -- surprise for the player.
 --
 
+-- enable extra popsicle types provided there are both vessels and fruits/veggies available
+-- fruit + glass -> juice; juice @ freezer -> popsicle + empty glass
+
+if minetest.get_modpath("vessels") then
+	dofile(minetest.get_modpath("freezer") .. "/juices.lua")
+end
+
 --
 -- Formspecs
 --
@@ -161,6 +168,26 @@ local function freezer_node_timer(pos, elapsed)
 			end
 		end 
 	end
+	      
+	-- juices -> popsicles
+	-- since we're dealing with 1 glass and not 1 bucket, the output is 1 item
+	if minetest.get_modpath("vessels") then
+		local input_stack = inv:get_stack("src", 1);
+		local input_name = input_stack:get_name();
+		if minetest.get_item_group(input_name, "juice") then
+			local output_name = input_name .. "_popsicle"
+			while inv:room_for_item("dst", output_name) do
+				local removed = inv:remove_item("src", input_name)
+				if removed:get_count() > 0 then
+					inv:add_item("dst", output_name)
+					inv:add_item("dst", "vessels:drinking_glass")
+				else
+					break
+				end
+			end
+		end
+	end
+
 
 	-- Check if we have cookable content
 	return
@@ -255,7 +282,7 @@ end
 	      
 if minetest.get_modpath("mobs") and mobs and mobs.mod == "redo" then
 	minetest.register_craftitem("freezer:milk_popsicle", {
-	description = "Ice Cream Popsicle",
+	description = "Eskimo icecream",
 	inventory_image = "milk_popsicle.png",
 	wield_image = "milk_popsicle.png",
 	stack_max = 99,
@@ -282,3 +309,9 @@ minetest.register_craft({
 	 "default:ice"
       }
 })
+
+-- -- enable extra popsicle types provided there are both vessels and fruits/veggies available
+-- -- fruit + glass -> juice; juice @ freezer -> popsicle + empty glass
+-- if minetest.get_modpath("vessels") and minetest.get_modpath("farming") then
+-- 	dofile("juices.lua")
+-- end
