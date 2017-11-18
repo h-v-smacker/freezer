@@ -112,7 +112,7 @@ for juice_name, def in pairs(juice_table) do
 			description = def.proper_name .. " popsicle",
 			inventory_image = juice_name .. "_popsicle.png",
 			wield_image = juice_name .. "_popsicle.png",
-			groups = { popsicle = 1, not_in_creative_inventory = 1 }
+			groups = { popsicle = 1, not_in_creative_inventory = 1 },
 			on_use = minetest.item_eat(def.orig_nutritional_value, "default:stick"),
 		})
 		
