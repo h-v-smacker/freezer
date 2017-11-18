@@ -22,7 +22,17 @@ Buckets of said liquids can be turned into eskimo icecream (an icecream on a woo
 a canonic kind of icecream in the USSR) and a cactus popsicle respectively. Since a whole 
 bucket is used, the yield is 3 items.
 
+
 The buckets are returned empty after use. The popsicles leave a fancy stick behind after being eaten.
+
+## Juices and popsicles
+
+Fruits, berries, and some vegetables can be squeezed into a glass (from vessels mod) using
+a shapeless recipe. The resulting product can be consumed as it is, or can be frozen into
+colorful popsicles (1 glass yields 1 popsicle).
+
+The buckets and glasses are returned empty after use (or consumption of beverages).
+The popsicles leave a fancy stick behind after being eaten.
 
 ## Pipeworks
 
