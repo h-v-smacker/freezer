@@ -174,7 +174,7 @@ local function freezer_node_timer(pos, elapsed)
 	if minetest.get_modpath("vessels") then
 		local input_stack = inv:get_stack("src", 1);
 		local input_name = input_stack:get_name();
-		if minetest.get_item_group(input_name, "juice") then
+		if minetest.get_item_group(input_name, "juice") > 0 then
 			local output_name = input_name .. "_popsicle"
 			while inv:room_for_item("dst", output_name) do
 				local removed = inv:remove_item("src", input_name)
