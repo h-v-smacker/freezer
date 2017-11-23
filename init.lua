@@ -40,7 +40,7 @@ local inactive_formspec =
 	default.gui_bg..
 	default.gui_bg_img..
 	default.gui_slots..
-	"list[current_name;src;2.5,1;1,1;]"..
+	"list[current_name;src;2.5,1.5;1,1;]"..
 	"image[3.75,1.5;1,1;gui_furnace_arrow_bg.png^[transformR270]"..
 	"list[current_name;dst;4.75,0.96;3,2;]"..
 	"list[current_player;main;0,4.25;8,1;]"..
