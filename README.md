@@ -34,6 +34,14 @@ colorful popsicles (1 glass yields 1 popsicle).
 The buckets and glasses are returned empty after use (or consumption of beverages).
 The popsicles leave a fancy stick behind after being eaten.
 
+## Pelmeni
+
+Pelmeni are a variety of dumplings from Russia, which are traditionally frozen after being
+formed. The raw pelmeni are made with 1 piece of meat from mobs_redo and 3 units of flour
+from farming. When frozen, they turn into packs of frozen pelmeni. Finally, such a pack
+should be cooked in a furnace to get the final product. Save for the cooked product, the 
+two intermediate stages are nigh inedible (1), whereas the cooked pelmeni are very nutritious (10).
+
 ## Pipeworks
 
 The freezer is pipeworks compatible. All incoming items are places into the source 
