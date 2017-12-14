@@ -188,6 +188,18 @@ local function freezer_node_timer(pos, elapsed)
 		end
 	end
 
+	      
+	-- pelmeni
+	-- while freezing is a crucial step in preparation, the full chain involves extra steps:
+	-- raw pelmeni -> pack of frozen pelmeni -> actual cooked pelmeni
+	if minetest.get_modpath("mobs") and mobs and mobs.mod == "redo" and minetest.get_modpath("farming") then
+		if inv:contains_item("src", "freezer:pelmeni_raw") then
+			if inv:room_for_item("dst", "freezer:pelmeni_pack 3") then
+				inv:remove_item("src", "freezer:pelmeni_raw")
+				inv:add_item("dst", "freezer:pelmeni_pack 3")
+			end
+		end 
+	end
 
 	-- Check if we have cookable content
 	return
@@ -270,25 +282,73 @@ minetest.register_node("freezer:freezer", {
 	      
 if minetest.get_modpath("ethereal") then
 	minetest.register_craftitem("freezer:cactus_popsicle", {
-	description = "Cactus Pulp Popsicle",
-	inventory_image = "cactus_popsicle.png",
-	wield_image = "cactus_popsicle.png",
-	stack_max = 99,
-	groups = { not_in_creative_inventory = 1 },
-	on_use = minetest.item_eat(1, "default:stick"),
-})
+		description = "Cactus Pulp Popsicle",
+		inventory_image = "cactus_popsicle.png",
+		wield_image = "cactus_popsicle.png",
+		stack_max = 99,
+		groups = { not_in_creative_inventory = 1 },
+		on_use = minetest.item_eat(1, "default:stick"),
+	})
 end
 	      
 	      
 if minetest.get_modpath("mobs") and mobs and mobs.mod == "redo" then
 	minetest.register_craftitem("freezer:milk_popsicle", {
-	description = "Eskimo icecream",
-	inventory_image = "milk_popsicle.png",
-	wield_image = "milk_popsicle.png",
-	stack_max = 99,
-	groups = { not_in_creative_inventory = 1 },
-	on_use = minetest.item_eat(1, "default:stick"),
-})
+		description = "Eskimo icecream",
+		inventory_image = "milk_popsicle.png",
+		wield_image = "milk_popsicle.png",
+		stack_max = 99,
+		groups = { not_in_creative_inventory = 1 },
+		on_use = minetest.item_eat(1, "default:stick"),
+	})
+end	
+	      
+if minetest.get_modpath("mobs") and mobs and mobs.mod == "redo" and minetest.get_modpath("farming") then
+	
+	-- both the dough and the frozen pelmeni are nigh inedible
+	-- only the cooked product should reveal the benefits of preparing this food
+	      
+	minetest.register_craftitem("freezer:pelmeni_raw", {
+		description = "Raw pelmeni",
+		inventory_image = "pelmeni_raw.png",
+		wield_image = "pelmeni_raw.png",
+		stack_max = 99,
+		groups = { not_in_creative_inventory = 1 },
+		on_use = minetest.item_eat(1),
+	})
+     
+	minetest.register_craftitem("freezer:pelmeni_pack", {
+		description = "A pack of frozen pelmeni",
+		inventory_image = "pelmeni_pack.png",
+		wield_image = "pelmeni_pack.png",
+		stack_max = 99,
+		groups = { not_in_creative_inventory = 1 },
+		on_use = minetest.item_eat(1),
+	})
+	      
+	minetest.register_craftitem("freezer:pelmeni", {
+		description = "Cooked pelmeni",
+		inventory_image = "pelmeni.png",
+		wield_image = "pelmeni.png",
+		stack_max = 99,
+		groups = { not_in_creative_inventory = 1 },
+		on_use = minetest.item_eat(10),
+	})
+	    
+	minetest.register_craft({
+		type = "shapeless",
+		output = "freezer:pelmeni_raw",
+		recipe = {"mobs:meat_raw", "farming:flour", "farming:flour", "farming:flour"},
+	})      
+	      
+	minetest.register_craft({
+		type = "cooking",
+		cooktime = 10,
+		output = "freezer:pelmeni",
+		recipe = "freezer:pelmeni_pack"
+	})
+
+	
 end
 	  
 	      
@@ -309,9 +369,3 @@ minetest.register_craft({
 	 "default:ice"
       }
 })
-
--- -- enable extra popsicle types provided there are both vessels and fruits/veggies available
--- -- fruit + glass -> juice; juice @ freezer -> popsicle + empty glass
--- if minetest.get_modpath("vessels") and minetest.get_modpath("farming") then
--- 	dofile("juices.lua")
--- end
