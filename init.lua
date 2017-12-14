@@ -201,6 +201,17 @@ local function freezer_node_timer(pos, elapsed)
 		end 
 	end
 
+	-- aspic
+	if minetest.get_modpath("mobs") and mobs and mobs.mod == "redo" and minetest.get_modpath("ethereal") then
+	      if inv:contains_item("src", "freezer:meat_broth") then
+			if inv:room_for_item("dst", "freezer:aspic 5") then
+				inv:remove_item("src", "freezer:meat_broth")
+				inv:add_item("dst", "freezer:aspic 5")
+				inv:add_item("dst", "bucket:bucket_empty")
+			end
+		end 
+	end
+	      
 	-- Check if we have cookable content
 	return
 end
@@ -302,7 +313,43 @@ if minetest.get_modpath("mobs") and mobs and mobs.mod == "redo" then
 		on_use = minetest.item_eat(1, "default:stick"),
 	})
 end	
+
+-- aspic
+-- bones + bucket of water + meat = broth -> freezer -> portions of aspic
+
+if minetest.get_modpath("mobs") and mobs and mobs.mod == "redo" and minetest.get_modpath("ethereal") then
+	minetest.register_craftitem("freezer:meat_broth", {
+		description = "Meat broth",
+		inventory_image = "meat_broth.png",
+		wield_image = "meat_broth.png",
+		stack_max = 99,
+		groups = { },
+		on_use = minetest.item_eat(3, "bucket:bucket_empty"),
+	})
 	      
+	minetest.register_craft({
+		type = "shapeless",
+		output = "freezer:meat_broth",
+		recipe = {"mobs:meat_raw", "ethereal:bone", "bucket:bucket_river_water"},
+	})
+	      
+	minetest.register_craft({
+		type = "shapeless",
+		output = "freezer:meat_broth",
+		recipe = {"mobs:meat_raw", "ethereal:bone", "bucket:bucket_water"},
+	})   
+	      
+	minetest.register_craftitem("freezer:aspic", {
+		description = "A portion of aspic",
+		inventory_image = "aspic.png",
+		wield_image = "aspic.png",
+		stack_max = 99,
+		groups = { not_in_creative_inventory = 1 },
+		on_use = minetest.item_eat(6),
+	})
+end
+	      
+-- pelmeni (dumplings with meat filling)
 if minetest.get_modpath("mobs") and mobs and mobs.mod == "redo" and minetest.get_modpath("farming") then
 	
 	-- both the dough and the frozen pelmeni are nigh inedible
@@ -313,7 +360,7 @@ if minetest.get_modpath("mobs") and mobs and mobs.mod == "redo" and minetest.get
 		inventory_image = "pelmeni_raw.png",
 		wield_image = "pelmeni_raw.png",
 		stack_max = 99,
-		groups = { not_in_creative_inventory = 1 },
+		groups = {  },
 		on_use = minetest.item_eat(1),
 	})
      
