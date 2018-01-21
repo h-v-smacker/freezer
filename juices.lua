@@ -17,6 +17,12 @@
 
 local juice_table = {
 	orange_juice = {
+		proper_name = "Apple juice",
+		found_in = "default",
+		obj_name = "apple",
+		orig_nutritional_value = 2
+	},
+	orange_juice = {
 		proper_name = "Orange juice",
 		found_in = "ethereal",
 		obj_name = "orange",
