@@ -415,6 +415,18 @@ minetest.register_craft({
 		{"default:steel_ingot", "default:mese_crystal", "default:steel_ingot"}
 	}
 })
+
+if minetest.get_modpath("ethereal") then
+	minetest.register_craft({
+		output = "freezer:freezer",
+		recipe = {
+			{"default:steel_ingot", "default:steel_ingot", "default:steel_ingot"},
+			{"default:steel_ingot", "", "default:steel_ingot"},
+			{"default:steel_ingot", "ethereal:crystal_spike", "default:steel_ingot"}
+		}
+	})
+end
+
 	      
 	      
 minetest.register_craft({

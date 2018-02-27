@@ -15,6 +15,17 @@
 	-- internal_name_of_the_juice_popsicle.png for the popsicle form
 ]]
 
+-- clear the recipe for juice from farming redo for consistency's sake
+
+minetest.clear_craft({
+	output = "farming:pineapple_juice",
+	type = "shapeless",
+	recipe = {"vessels:drinking_glass", "farming:pineapple_ring",
+			"farming:pineapple_ring", "farming:pineapple_ring"}
+})
+minetest.unregister_item("farming:pineapple_juice")
+
+
 local juice_table = {
 	orange_juice = {
 		proper_name = "Apple juice",
@@ -94,7 +105,12 @@ local juice_table = {
 		obj_name = "tomato",
 		orig_nutritional_value = 4
 	},
-
+	pineapple_juice = {
+		proper_name = "Pineapple juice",
+		found_in = "farming",
+		obj_name = "pineapple_ring",
+		orig_nutritional_value = 1
+	},
 }
 
 
