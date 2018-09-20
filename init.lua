@@ -7,10 +7,22 @@
 -- enable extra popsicle types provided there are both vessels and fruits/veggies available
 -- fruit + glass -> juice; juice @ freezer -> popsicle + empty glass
 
+if minetest.get_modpath("unified_inventory") and unified_inventory.register_craft_type then
+		unified_inventory.register_craft_type("freezing", {
+				description = "Freezing",
+				icon = "freezing_icon.png",
+				width = 1,
+				height = 1,
+				uses_crafting_grid = false,
+		})
+end
+
 if minetest.get_modpath("vessels") then
 	dofile(minetest.get_modpath("freezer") .. "/juices.lua")
 end
 
+
+	
 --
 -- Formspecs
 --
@@ -130,7 +142,8 @@ local function freezer_node_timer(pos, elapsed)
 			inv:add_item("dst", "bucket:bucket_empty")
 	      end
 	end
-	   
+	
+    
 	-- an extra recipe involving liquid in a bucket, for good measure
 	-- a cactus pulp bucket gives 2 hp, but freezing it gives 3 popsicles, each
 	-- of them giving 1 hp, achieving 50% increase in efficiency through processing
@@ -436,3 +449,51 @@ minetest.register_craft({
 	 "default:ice"
       }
 })
+
+if minetest.get_modpath("unified_inventory") and unified_inventory.register_craft then
+	unified_inventory.register_craft({
+		type = "freezing",
+		output = "default:ice",
+		items = {"bucket:bucket_water"},
+	})
+	      
+	      
+	unified_inventory.register_craft({
+		type = "freezing",
+		output = "default:ice",
+		items = {"bucket:bucket_river_water"},
+	})
+	
+	if minetest.get_modpath("ethereal") then
+		unified_inventory.register_craft({
+			type = "freezing",
+			output = "freezer:cactus_popsicle 3",
+			items = {"ethereal:bucket_cactus"},
+		})    
+	end	
+
+	if minetest.get_modpath("mobs") and mobs and mobs.mod == "redo" then
+		unified_inventory.register_craft({
+			type = "freezing",
+			output = "freezer:milk_popsicle 3",
+			items = {"mobs:bucket_milk"},
+		})    
+	end
+	
+	if minetest.get_modpath("mobs") and mobs and mobs.mod == "redo" and minetest.get_modpath("farming") then
+		unified_inventory.register_craft({
+			type = "freezing",
+			output = "freezer:pelmeni_pack 3",
+			items = {"freezer:pelmeni_raw"},
+		}) 
+	end
+
+	if minetest.get_modpath("mobs") and mobs and mobs.mod == "redo" and minetest.get_modpath("ethereal") then
+		unified_inventory.register_craft({
+			type = "freezing",
+			output = "freezer:aspic 5",
+			items = {"freezer:meat_broth"},
+		}) 
+	end
+	
+end
