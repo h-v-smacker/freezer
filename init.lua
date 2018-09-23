@@ -213,7 +213,7 @@ local function freezer_node_timer(pos, elapsed)
 	end
 	      
 	-- Check if we have cookable content
-	return
+	return true
 end
 
 	      
