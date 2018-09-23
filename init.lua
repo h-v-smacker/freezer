@@ -7,10 +7,22 @@
 -- enable extra popsicle types provided there are both vessels and fruits/veggies available
 -- fruit + glass -> juice; juice @ freezer -> popsicle + empty glass
 
+if minetest.get_modpath("unified_inventory") and unified_inventory.register_craft_type then
+		unified_inventory.register_craft_type("freezing", {
+				description = "Freezing",
+				icon = "freezing_icon.png",
+				width = 1,
+				height = 1,
+				uses_crafting_grid = false,
+		})
+end
+
 if minetest.get_modpath("vessels") then
 	dofile(minetest.get_modpath("freezer") .. "/juices.lua")
 end
 
+
+	
 --
 -- Formspecs
 --
@@ -123,20 +135,21 @@ local function freezer_node_timer(pos, elapsed)
 	-- takes both regular and river water
 	if inv:contains_item("src", "bucket:bucket_water") or 
 	      inv:contains_item("src", "bucket:bucket_river_water") then
-		if inv:room_for_item("dst", "default:ice") then
+		if inv:room_for_item("dst", "default:ice") and inv:room_for_item("dst", "bucket:bucket_empty") then
 			inv:remove_item("src", "bucket:bucket_water")
 			inv:remove_item("src", "bucket:bucket_river_water")
 			inv:add_item("dst", "default:ice")
 			inv:add_item("dst", "bucket:bucket_empty")
 	      end
 	end
-	   
+	
+    
 	-- an extra recipe involving liquid in a bucket, for good measure
 	-- a cactus pulp bucket gives 2 hp, but freezing it gives 3 popsicles, each
 	-- of them giving 1 hp, achieving 50% increase in efficiency through processing
 	if minetest.get_modpath("ethereal") then
 		if inv:contains_item("src", "ethereal:bucket_cactus") then
-			if inv:room_for_item("dst", "freezer:cactus_popsicle 3") then
+			if inv:room_for_item("dst", "freezer:cactus_popsicle 3") and inv:room_for_item("dst", "bucket:bucket_empty") then
 				inv:remove_item("src", "ethereal:bucket_cactus")
 				inv:add_item("dst", "freezer:cactus_popsicle 3")
 				inv:add_item("dst", "bucket:bucket_empty")
@@ -147,7 +160,7 @@ local function freezer_node_timer(pos, elapsed)
 	-- and yet another liquid in a bucket, this time with no extravagance though
 	if minetest.get_modpath("mobs") and mobs and mobs.mod == "redo" then
 		if inv:contains_item("src", "mobs:bucket_milk") then
-			if inv:room_for_item("dst", "freezer:milk_popsicle 3") then
+			if inv:room_for_item("dst", "freezer:milk_popsicle 3") and inv:room_for_item("dst", "bucket:bucket_empty") then
 				inv:remove_item("src", "mobs:bucket_milk")
 				inv:add_item("dst", "freezer:milk_popsicle 3")
 				inv:add_item("dst", "bucket:bucket_empty")
@@ -176,7 +189,7 @@ local function freezer_node_timer(pos, elapsed)
 		local input_name = input_stack:get_name();
 		if minetest.get_item_group(input_name, "juice") > 0 then
 			local output_name = input_name .. "_popsicle"
-			while inv:room_for_item("dst", output_name) do
+			while inv:room_for_item("dst", output_name) and inv:room_for_item("dst", "vessels:drinking_glass") do
 				local removed = inv:remove_item("src", input_name)
 				if removed:get_count() > 0 then
 					inv:add_item("dst", output_name)
@@ -194,9 +207,13 @@ local function freezer_node_timer(pos, elapsed)
 	-- raw pelmeni -> pack of frozen pelmeni -> actual cooked pelmeni
 	if minetest.get_modpath("mobs") and mobs and mobs.mod == "redo" and minetest.get_modpath("farming") then
 		if inv:contains_item("src", "freezer:pelmeni_raw") then
-			if inv:room_for_item("dst", "freezer:pelmeni_pack 3") then
-				inv:remove_item("src", "freezer:pelmeni_raw")
-				inv:add_item("dst", "freezer:pelmeni_pack 3")
+            while inv:room_for_item("dst", "freezer:pelmeni_pack 3") do
+				local removed = inv:remove_item("src", "freezer:pelmeni_raw")
+				if removed:get_count() > 0 then
+					inv:add_item("dst", "freezer:pelmeni_pack 3")
+				else
+					break
+				end
 			end
 		end 
 	end
@@ -204,11 +221,15 @@ local function freezer_node_timer(pos, elapsed)
 	-- aspic
 	if minetest.get_modpath("mobs") and mobs and mobs.mod == "redo" and minetest.get_modpath("ethereal") then
 	      if inv:contains_item("src", "freezer:meat_broth") then
-			if inv:room_for_item("dst", "freezer:aspic 5") then
-				inv:remove_item("src", "freezer:meat_broth")
-				inv:add_item("dst", "freezer:aspic 5")
-				inv:add_item("dst", "bucket:bucket_empty")
-			end
+            while inv:room_for_item("dst", "freezer:aspic 5") and inv:room_for_item("dst", "bucket:bucket_empty") do
+				local removed = inv:remove_item("src", "freezer:meat_broth")
+				if removed:get_count() > 0 then
+	    			inv:add_item("dst", "freezer:aspic 5")
+			    	inv:add_item("dst", "bucket:bucket_empty")
+				else
+					break
+				end
+			end			
 		end 
 	end
 	      
@@ -407,6 +428,18 @@ minetest.register_craft({
 		{"default:steel_ingot", "default:mese_crystal", "default:steel_ingot"}
 	}
 })
+
+if minetest.get_modpath("ethereal") then
+	minetest.register_craft({
+		output = "freezer:freezer",
+		recipe = {
+			{"default:steel_ingot", "default:steel_ingot", "default:steel_ingot"},
+			{"default:steel_ingot", "", "default:steel_ingot"},
+			{"default:steel_ingot", "ethereal:crystal_spike", "default:steel_ingot"}
+		}
+	})
+end
+
 	      
 	      
 minetest.register_craft({
@@ -416,3 +449,51 @@ minetest.register_craft({
 	 "default:ice"
       }
 })
+
+if minetest.get_modpath("unified_inventory") and unified_inventory.register_craft then
+	unified_inventory.register_craft({
+		type = "freezing",
+		output = "default:ice",
+		items = {"bucket:bucket_water"},
+	})
+	      
+	      
+	unified_inventory.register_craft({
+		type = "freezing",
+		output = "default:ice",
+		items = {"bucket:bucket_river_water"},
+	})
+	
+	if minetest.get_modpath("ethereal") then
+		unified_inventory.register_craft({
+			type = "freezing",
+			output = "freezer:cactus_popsicle 3",
+			items = {"ethereal:bucket_cactus"},
+		})    
+	end	
+
+	if minetest.get_modpath("mobs") and mobs and mobs.mod == "redo" then
+		unified_inventory.register_craft({
+			type = "freezing",
+			output = "freezer:milk_popsicle 3",
+			items = {"mobs:bucket_milk"},
+		})    
+	end
+	
+	if minetest.get_modpath("mobs") and mobs and mobs.mod == "redo" and minetest.get_modpath("farming") then
+		unified_inventory.register_craft({
+			type = "freezing",
+			output = "freezer:pelmeni_pack 3",
+			items = {"freezer:pelmeni_raw"},
+		}) 
+	end
+
+	if minetest.get_modpath("mobs") and mobs and mobs.mod == "redo" and minetest.get_modpath("ethereal") then
+		unified_inventory.register_craft({
+			type = "freezing",
+			output = "freezer:aspic 5",
+			items = {"freezer:meat_broth"},
+		}) 
+	end
+	
+end

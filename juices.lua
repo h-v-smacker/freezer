@@ -15,7 +15,27 @@
 	-- internal_name_of_the_juice_popsicle.png for the popsicle form
 ]]
 
+-- clear the recipe for juice from farming redo for consistency's sake
+
+if minetest.get_modpath("farming") and farming.mod and farming.mod == "redo" then
+
+	minetest.clear_craft({
+		output = "farming:pineapple_juice",
+		type = "shapeless",
+		recipe = {"vessels:drinking_glass", "farming:pineapple_ring",
+				"farming:pineapple_ring", "farming:pineapple_ring"}
+	})
+	minetest.unregister_item("farming:pineapple_juice")
+	
+end
+
 local juice_table = {
+	orange_juice = {
+		proper_name = "Apple juice",
+		found_in = "default",
+		obj_name = "apple",
+		orig_nutritional_value = 2
+	},
 	orange_juice = {
 		proper_name = "Orange juice",
 		found_in = "ethereal",
@@ -88,7 +108,12 @@ local juice_table = {
 		obj_name = "tomato",
 		orig_nutritional_value = 4
 	},
-
+	pineapple_juice = {
+		proper_name = "Pineapple juice",
+		found_in = "farming",
+		obj_name = "pineapple_ring",
+		orig_nutritional_value = 1
+	},
 }
 
 
@@ -121,6 +146,14 @@ for juice_name, def in pairs(juice_table) do
 			output = "freezer:" .. juice_name,
 			recipe = {"vessels:drinking_glass", def.found_in .. ":" .. def.obj_name},
 		})
+		
+		if minetest.get_modpath("unified_inventory") and unified_inventory.register_craft then
+			unified_inventory.register_craft({
+				type = "freezing",
+				output = "freezer:" .. juice_name .. "_popsicle",
+				items = {"freezer:" .. juice_name},
+			})
+		end
 		
 	end
 end
