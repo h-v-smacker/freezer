@@ -171,13 +171,9 @@ local function freezer_node_timer(pos, elapsed)
 	-- and of course what is hot can be cooled down
 	if minetest.get_modpath("farming") then
 		if inv:contains_item("src", "farming:coffee_cup_hot") then
-			while inv:room_for_item("dst", "farming:coffee_cup") do
+			if inv:room_for_item("dst", "farming:coffee_cup") then
 				local removed = inv:remove_item("src", "farming:coffee_cup_hot")
-				if removed:get_count() > 0 then
-					inv:add_item("dst", "farming:coffee_cup")
-				else
-					break
-				end
+				inv:add_item("dst", "farming:coffee_cup")
 			end
 		end 
 	end
@@ -189,14 +185,10 @@ local function freezer_node_timer(pos, elapsed)
 		local input_name = input_stack:get_name();
 		if minetest.get_item_group(input_name, "juice") > 0 then
 			local output_name = input_name .. "_popsicle"
-			while inv:room_for_item("dst", output_name) and inv:room_for_item("dst", "vessels:drinking_glass") do
+			if inv:room_for_item("dst", output_name) and inv:room_for_item("dst", "vessels:drinking_glass") then
 				local removed = inv:remove_item("src", input_name)
-				if removed:get_count() > 0 then
-					inv:add_item("dst", output_name)
-					inv:add_item("dst", "vessels:drinking_glass")
-				else
-					break
-				end
+				inv:add_item("dst", output_name)
+				inv:add_item("dst", "vessels:drinking_glass")
 			end
 		end
 	end
@@ -207,13 +199,9 @@ local function freezer_node_timer(pos, elapsed)
 	-- raw pelmeni -> pack of frozen pelmeni -> actual cooked pelmeni
 	if minetest.get_modpath("mobs") and mobs and mobs.mod == "redo" and minetest.get_modpath("farming") then
 		if inv:contains_item("src", "freezer:pelmeni_raw") then
-            while inv:room_for_item("dst", "freezer:pelmeni_pack 3") do
+            if inv:room_for_item("dst", "freezer:pelmeni_pack 3") then
 				local removed = inv:remove_item("src", "freezer:pelmeni_raw")
-				if removed:get_count() > 0 then
-					inv:add_item("dst", "freezer:pelmeni_pack 3")
-				else
-					break
-				end
+				inv:add_item("dst", "freezer:pelmeni_pack 3")
 			end
 		end 
 	end
@@ -221,20 +209,18 @@ local function freezer_node_timer(pos, elapsed)
 	-- aspic
 	if minetest.get_modpath("mobs") and mobs and mobs.mod == "redo" and minetest.get_modpath("ethereal") then
 	      if inv:contains_item("src", "freezer:meat_broth") then
-            while inv:room_for_item("dst", "freezer:aspic 5") and inv:room_for_item("dst", "bucket:bucket_empty") do
+            if inv:room_for_item("dst", "freezer:aspic 5") and inv:room_for_item("dst", "bucket:bucket_empty") then
 				local removed = inv:remove_item("src", "freezer:meat_broth")
-				if removed:get_count() > 0 then
 	    			inv:add_item("dst", "freezer:aspic 5")
 			    	inv:add_item("dst", "bucket:bucket_empty")
-				else
-					break
-				end
 			end			
 		end 
 	end
 	      
-	-- Check if we have cookable content
-	return true
+	-- Check if we have freezable content
+	if not inv:is_empty("src") then
+	    return true
+	end
 end
 
 	      
