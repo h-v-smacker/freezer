@@ -376,7 +376,7 @@ if minetest.get_modpath("mobs") and mobs and mobs.mod == "redo" and minetest.get
 		inventory_image = "pelmeni_pack.png",
 		wield_image = "pelmeni_pack.png",
 		stack_max = 99,
-		groups = { not_in_creative_inventory = 1 },
+		groups = {  },
 		on_use = minetest.item_eat(1),
 	})
 	      
@@ -385,7 +385,7 @@ if minetest.get_modpath("mobs") and mobs and mobs.mod == "redo" and minetest.get
 		inventory_image = "pelmeni.png",
 		wield_image = "pelmeni.png",
 		stack_max = 99,
-		groups = { not_in_creative_inventory = 1 },
+		groups = { },
 		on_use = minetest.item_eat(10),
 	})
 	    
