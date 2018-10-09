@@ -127,7 +127,7 @@ for juice_name, def in pairs(juice_table) do
 			description = def.proper_name,
 			inventory_image = juice_name .. "_inv.png",
 			wield_image = juice_name .. ".png",
-			groups = { juice = 1 },
+			groups = { juice = 1, vessel = 1 },
 			on_use = minetest.item_eat(def.orig_nutritional_value+1, "vessels:drinking_glass"),
 		})
 		
