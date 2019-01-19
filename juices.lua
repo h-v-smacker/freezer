@@ -15,19 +15,19 @@
 	-- internal_name_of_the_juice_popsicle.png for the popsicle form
 ]]
 
--- clear the recipe for juice from farming redo for consistency's sake
-
-if minetest.get_modpath("farming") and farming.mod and farming.mod == "redo" then
-
-	minetest.clear_craft({
-		output = "farming:pineapple_juice",
-		type = "shapeless",
-		recipe = {"vessels:drinking_glass", "farming:pineapple_ring",
-				"farming:pineapple_ring", "farming:pineapple_ring"}
-	})
-	minetest.unregister_item("farming:pineapple_juice")
-	
-end
+-- -- clear the recipe for juice from farming redo for consistency's sake
+-- 
+-- if minetest.get_modpath("farming") and farming.mod and farming.mod == "redo" then
+-- 
+-- 	minetest.clear_craft({
+-- 		output = "farming:pineapple_juice",
+-- 		type = "shapeless",
+-- 		recipe = {"vessels:drinking_glass", "farming:pineapple_ring",
+-- 				"farming:pineapple_ring", "farming:pineapple_ring"}
+-- 	})
+-- 	minetest.unregister_item("farming:pineapple_juice")
+-- 	
+-- end
 
 local juice_table = {
 	orange_juice = {
