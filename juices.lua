@@ -30,7 +30,7 @@
 -- end
 
 local juice_table = {
-	orange_juice = {
+	apple_juice = {
 		proper_name = "Apple juice",
 		found_in = "default",
 		obj_name = "apple",
@@ -102,6 +102,12 @@ local juice_table = {
 		obj_name = "pumpkin_slice",
 		orig_nutritional_value = 2
 	},
+	rhubarb_juice = {
+		proper_name = "Rhubarb juice",
+		found_in = "farming",
+		obj_name = "rhubarb",
+		orig_nutritional_value = 1
+	},
 	tomato_juice = {
 		proper_name = "Tomato juice",
 		found_in = "farming",
@@ -116,6 +122,25 @@ local juice_table = {
 	},
 }
 
+-- mod-specific additions
+
+if minetest.get_modpath("ethereal") and ethereal.mod and ethereal.mod == "undo" then
+	juice_table.lemon_juice = {
+		proper_name = "Lemon juice",
+		found_in = "ethereal",
+		obj_name = "lemon",
+		orig_nutritional_value = 5
+	}
+end
+
+if minetest.get_modpath("farming") and farming.mod and farming.mod == "undo" then
+	juice_table.blackberry_juice = {
+		proper_name = "Blackberry juice",
+		found_in = "farming",
+		obj_name = "blackberry",
+		orig_nutritional_value = 1
+	}
+end
 
 -- all juices are created accoriding to a single universal scheme
 for juice_name, def in pairs(juice_table) do
